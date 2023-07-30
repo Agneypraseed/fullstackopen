@@ -17,9 +17,7 @@ sequenceDiagram
     browser->>server: GET https://studies.cs.helsinki.fi/exampleapp/spa.js
     activate server
     server-->>browser: the JavaScript file
-    deactivate server
-
-    Note right of browser: The browser starts executing the JavaScript code that fetches the JSON from the server
+    deactivate server    
 
     browser->>server: GET https://studies.cs.helsinki.fi/exampleapp/data.json
     activate server
