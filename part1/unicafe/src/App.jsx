@@ -19,13 +19,19 @@ const Statistics = ({ good, neutral, bad }) => {
 
   return (
     <>
-      <h1>statistics</h1>
-      <p>good {good}</p>
-      <p>neutral {neutral}</p>
-      <p>bad {bad}</p>
-      <p>all {calcTotal()}</p>
-      <p>average {calcAvg()}</p>
-      <p>positive {calcPositive()} %</p>
+      {calcTotal() == 0 ? (
+        <p>No feedback given</p>
+      ) : (
+        <>
+          <h1>statistics</h1>
+          <p>good {good}</p>
+          <p>neutral {neutral}</p>
+          <p>bad {bad}</p>
+          <p>all {calcTotal()}</p>
+          <p>average {calcAvg()}</p>
+          <p>positive {calcPositive()} %</p>
+        </>
+      )}
     </>
   );
 };
