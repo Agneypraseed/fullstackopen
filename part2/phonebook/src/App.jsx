@@ -8,7 +8,7 @@ const App = () => {
     { name: "Mary Poppendieck", number: "39-23-6423122", id: 4 },
   ]);
   const [newName, setNewName] = useState("");
-  const [newNumber, setNewNunber] = useState("");
+  const [newNumber, setNewNumber] = useState("");
   const [filterFlag, setFilterFlag] = useState(false);
   const [filterdPersons, setFilteredPersons] = useState([{}]);
 
@@ -32,6 +32,7 @@ const App = () => {
         number: newNumber,
       };
       setPersons(persons.concat(newPerson));
+      e.target.reset();
     }
   };
 
@@ -40,7 +41,7 @@ const App = () => {
   };
 
   const handleNumber = (e) => {
-    setNewNunber(e.target.value);
+    setNewNumber(e.target.value);
   };
 
   const handleFilter = (e) => {
