@@ -9,16 +9,17 @@ const PersonDetail = ({ person }) => {
   );
 };
 
-const Persons = ({ persons }) => {    
+const Persons = ({ persons }) => {
+  // const isEmptyPhonebook = JSON.stringify(persons[0]) == JSON.stringify({});
+  const isEmptyPhonebook = Object.keys(persons[0]).length === 0;
+
   return (
     <>
-      {JSON.stringify(persons[0]) == JSON.stringify({}) ? (
-        null
-      ) : (
-        persons.map((person) => (
-          <PersonDetail key={person.name} person={person} />
-        ))
-      )}
+      {isEmptyPhonebook
+        ? `Loading Phonebook from server!!!`
+        : persons.map((person) => (
+            <PersonDetail key={person.name} person={person} />
+          ))}
     </>
   );
 };
