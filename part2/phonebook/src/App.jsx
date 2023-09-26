@@ -1,4 +1,5 @@
-import { useState } from "react";
+import axios from "axios";
+import { useEffect, useState } from "react";
 
 const PersonDetail = ({ person }) => {
   return (
@@ -8,12 +9,16 @@ const PersonDetail = ({ person }) => {
   );
 };
 
-const Persons = ({ persons }) => {
+const Persons = ({ persons }) => {    
   return (
     <>
-      {persons.map((person) => (
-        <PersonDetail key={person.name} person={person} />
-      ))}
+      {JSON.stringify(persons[0]) == JSON.stringify({}) ? (
+        null
+      ) : (
+        persons.map((person) => (
+          <PersonDetail key={person.name} person={person} />
+        ))
+      )}
     </>
   );
 };
@@ -43,13 +48,17 @@ const PersonForm = ({ handleName, handleNumber, handleSubmit }) => {
 };
 
 const App = () => {
-  const [persons, setPersons] = useState([
-    { name: "Arto Hellas", number: "040-123456", id: 1 },
-  ]);
+  const [persons, setPersons] = useState([{}]);
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [filterFlag, setFilterFlag] = useState(false);
   const [filterdPersons, setFilteredPersons] = useState([{}]);
+
+  useEffect(() => {
+    axios.get("http://localhost:3001/persons").then((res) => {
+      setPersons(res.data);
+    });
+  }, []);
 
   let saveFlag = true;
 
