@@ -1,11 +1,50 @@
 import { useState } from "react";
 
+const PersonDetail = ({ person }) => {
+  return (
+    <p>
+      {person.name} {person.number}
+    </p>
+  );
+};
+
+const Persons = ({ persons }) => {
+  return (
+    <>
+      {persons.map((person) => (
+        <PersonDetail key={person.name} person={person} />
+      ))}
+    </>
+  );
+};
+
+const Filter = ({ handleFilter }) => {
+  return (
+    <div>
+      filter shown with <input onChange={handleFilter} />
+    </div>
+  );
+};
+
+const PersonForm = ({ handleName, handleNumber, handleSubmit }) => {
+  return (
+    <form onSubmit={handleSubmit}>
+      <div>
+        name: <input onChange={handleName} />
+      </div>
+      <div>
+        number: <input onChange={handleNumber} />
+      </div>
+      <div>
+        <button type="submit">add</button>
+      </div>
+    </form>
+  );
+};
+
 const App = () => {
   const [persons, setPersons] = useState([
     { name: "Arto Hellas", number: "040-123456", id: 1 },
-    { name: "Ada Lovelace", number: "39-44-5323523", id: 2 },
-    { name: "Dan Abramov", number: "12-43-234345", id: 3 },
-    { name: "Mary Poppendieck", number: "39-23-6423122", id: 4 },
   ]);
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
@@ -13,6 +52,14 @@ const App = () => {
   const [filterdPersons, setFilteredPersons] = useState([{}]);
 
   let saveFlag = true;
+
+  const handleName = (e) => {
+    setNewName(e.target.value.trim());
+  };
+
+  const handleNumber = (e) => {
+    setNewNumber(e.target.value);
+  };
 
   const checkIfNameExists = () => {
     persons.forEach((person) => {
@@ -36,14 +83,6 @@ const App = () => {
     }
   };
 
-  const handleName = (e) => {
-    setNewName(e.target.value.trim());
-  };
-
-  const handleNumber = (e) => {
-    setNewNumber(e.target.value);
-  };
-
   const handleFilter = (e) => {
     const filterValue = e.target.value.toLowerCase().trim();
     setFilterFlag(filterValue !== "");
@@ -55,36 +94,16 @@ const App = () => {
     );
   };
 
-  const Persons = ({ persons }) => {
-    return (
-      <>
-        {persons.map((person) => (
-          <p key={person.name}>
-            {person.name} {person.number}
-          </p>
-        ))}
-      </>
-    );
-  };
-
   return (
     <div>
       <h2>Phonebook</h2>
-      <div>
-        filter shown with <input onChange={handleFilter} />
-      </div>
+      <Filter handleFilter={handleFilter} />
       <h2>add a new</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
-          name: <input onChange={handleName} />
-        </div>
-        <div>
-          number: <input onChange={handleNumber} />
-        </div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
+      <PersonForm
+        handleName={handleName}
+        handleNumber={handleNumber}
+        handleSubmit={handleSubmit}
+      />
       <h2>Numbers</h2>
       {filterFlag ? (
         <Persons persons={filterdPersons} />
