@@ -1,5 +1,5 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
+import phonebookService from "./services/phonebook";
 
 const PersonDetail = ({ person }) => {
   return (
@@ -54,11 +54,9 @@ const App = () => {
   const [filterFlag, setFilterFlag] = useState(false);
   const [filterdPersons, setFilteredPersons] = useState([{}]);
 
-  const baseUrl = "http://localhost:3001/persons";
-
   useEffect(() => {
-    axios.get(baseUrl).then((res) => {
-      setPersons(res.data);
+    phonebookService.getPhonebook().then((persons) => {
+      if (persons != undefined) setPersons(persons);
     });
   }, []);
 
@@ -89,10 +87,10 @@ const App = () => {
         name: newName,
         number: newNumber,
       };
-      axios
-        .post(baseUrl, newPerson)
-        .then((res) => setPersons(persons.concat(res.data)))
-        .catch((err) => console.log("Error while Saving to database", err));
+
+      phonebookService
+        .updatePhoneBook(newPerson)
+        .then((res) => setPersons(persons.concat(res)));
       e.target.reset();
     }
   };
@@ -103,7 +101,6 @@ const App = () => {
     setFilteredPersons(
       persons.filter((person) => {
         return person.name.toLowerCase().includes(filterValue);
-        //  && person.name.toLowerCase().startsWith(filterValue);
       })
     );
   };
