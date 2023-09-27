@@ -10,7 +10,6 @@ const PersonDetail = ({ person }) => {
 };
 
 const Persons = ({ persons }) => {
-  // const isEmptyPhonebook = JSON.stringify(persons[0]) == JSON.stringify({});
   const isEmptyPhonebook = Object.keys(persons[0]).length === 0;
 
   return (
@@ -55,8 +54,10 @@ const App = () => {
   const [filterFlag, setFilterFlag] = useState(false);
   const [filterdPersons, setFilteredPersons] = useState([{}]);
 
+  const baseUrl = "http://localhost:3001/persons";
+
   useEffect(() => {
-    axios.get("http://localhost:3001/persons").then((res) => {
+    axios.get(baseUrl).then((res) => {
       setPersons(res.data);
     });
   }, []);
@@ -88,7 +89,10 @@ const App = () => {
         name: newName,
         number: newNumber,
       };
-      setPersons(persons.concat(newPerson));
+      axios
+        .post(baseUrl, newPerson)
+        .then((res) => setPersons(persons.concat(res.data)))
+        .catch((err) => console.log("Error while Saving to database", err));
       e.target.reset();
     }
   };
