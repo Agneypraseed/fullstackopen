@@ -93,24 +93,39 @@ const App = () => {
     setNewNumber(e.target.value);
   };
 
-  const checkIfNameExists = () => {
+  const checkIfNameExists = (e) => {
     persons.forEach((person) => {
       if (person.name === newName) {
+        if (
+          window.confirm(
+            `${newName} is already added to phonebook, replace the old number with a new one?`
+          )
+        ) {
+          const newPerson = {
+            name: newName,
+            number: newNumber,
+          };
+          phonebookService.updatePerson(person.id, newPerson).then((res) => {
+            setPersons(persons.map((o) => (o.id !== person.id ? o : res)));
+            setFilteredPersons(
+              filterdPersons.map((o) => (o.id !== person.id ? o : res))
+            );
+          }); 
+          e.target.reset();         
+        }
         saveFlag = false;
-        alert(`${newName} is already added to phonebook`);
       }
     });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    checkIfNameExists();
+    checkIfNameExists(e);
     if (saveFlag && newName != "") {
       const newPerson = {
         name: newName,
         number: newNumber,
       };
-
       phonebookService
         .updatePhoneBook(newPerson)
         .then((res) => setPersons(persons.concat(res)));
