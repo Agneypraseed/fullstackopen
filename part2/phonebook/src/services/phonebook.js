@@ -16,4 +16,11 @@ const updatePhoneBook = (newPerson) => {
     .catch((err) => console.log("Error while Saving to database", err));
 };
 
-export default { getPhonebook, updatePhoneBook };
+const deletePerson = (id) => {
+  const request = axios.delete(`${baseUrl}/${id}`);
+  return request
+    .then((res) => res.status)
+    .catch((err) => console.error("Error deleting", err));
+};
+
+export default { getPhonebook, updatePhoneBook, deletePerson };

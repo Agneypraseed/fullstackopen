@@ -1,24 +1,47 @@
 import { useEffect, useState } from "react";
 import phonebookService from "./services/phonebook";
+import "./App.css";
 
-const PersonDetail = ({ person }) => {
+const DeletePerson = ({ person, handleDelete }) => {
   return (
-    <p>
-      {person.name} {person.number}
-    </p>
+    <button type="submit" onClick={() => handleDelete(person)}>
+      delete
+    </button>
   );
 };
 
-const Persons = ({ persons }) => {
-  const isEmptyPhonebook = Object.keys(persons[0]).length === 0;
+const PersonDetail = ({ person, handleDelete }) => {
+  return (
+    <div className="container">
+      <p>
+        {person.name} {person.number}
+      </p>
+      <DeletePerson person={person} handleDelete={handleDelete} />
+    </div>
+  );
+};
+
+const Persons = ({ persons, handleDelete }) => {
+  const isEmptyPhonebook = persons.length === 0;
+  const isFetchingPhoneBookFromServer =
+    !isEmptyPhonebook && Object.keys(persons[0]).length === 0;
+
+  if (isEmptyPhonebook) return <p>No Matching Records available</p>;
+  if (isFetchingPhoneBookFromServer)
+    return <p>Loading Phonebook from server</p>;
 
   return (
     <>
-      {isEmptyPhonebook
-        ? `Loading Phonebook from server!!!`
-        : persons.map((person) => (
-            <PersonDetail key={person.name} person={person} />
-          ))}
+      {persons.map(
+        (person) =>
+          person !== undefined && (
+            <PersonDetail
+              key={person.name}
+              person={person}
+              handleDelete={handleDelete}
+            />
+          )
+      )}
     </>
   );
 };
@@ -105,6 +128,18 @@ const App = () => {
     );
   };
 
+  const handleDelete = (person) => {
+    if (window.confirm(`Delete ${person.name} ?`)) {
+      phonebookService.deletePerson(person.id).then((status) => {
+        if (status === 200) {
+          setPersons(persons.filter((p) => p.id !== person.id));
+        } else {
+          console.log(`Error - Could not delete ${person.name} from database`);
+        }
+      });
+    }
+  };
+
   return (
     <div>
       <h2>Phonebook</h2>
@@ -117,9 +152,9 @@ const App = () => {
       />
       <h2>Numbers</h2>
       {filterFlag ? (
-        <Persons persons={filterdPersons} />
+        <Persons persons={filterdPersons} handleDelete={handleDelete} />
       ) : (
-        <Persons persons={persons} />
+        <Persons persons={persons} handleDelete={handleDelete} />
       )}
     </div>
   );
