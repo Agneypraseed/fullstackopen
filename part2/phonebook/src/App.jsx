@@ -65,10 +65,10 @@ const PersonForm = ({ handleName, handleNumber, handleSubmit }) => {
   return (
     <form onSubmit={handleSubmit}>
       <div>
-        name: <input onChange={handleName} required/>
+        name: <input onChange={handleName} required />
       </div>
       <div>
-        number: <input onChange={handleNumber} required/>
+        number: <input onChange={handleNumber} required />
       </div>
       <div>
         <button type="submit">add</button>
@@ -114,16 +114,26 @@ const App = () => {
             number: newNumber,
           };
           phonebookService.updatePerson(person.id, newPerson).then((res) => {
-            setPersons(persons.map((o) => (o.id !== person.id ? o : res)));
-            setFilteredPersons(
-              filterdPersons.map((o) => (o.id !== person.id ? o : res))
-            );
+            if (res === undefined) {
+              setErrorMessage(
+                `Information of ${person.name} has already been removed from the server`
+              );
+              setPersons(persons.filter((o) => o.id !== person.id));
+              setFilteredPersons(
+                filterdPersons.filter((o) => o.id !== person.id)
+              );
+            } else {
+              setPersons(persons.map((o) => (o.id !== person.id ? o : res)));
+              setFilteredPersons(
+                filterdPersons.map((o) => (o.id !== person.id ? o : res))
+              );
+              setErrorMessage(`Updated ${newName}`);
+              setTimeout(() => {
+                setErrorMessage(null);
+              }, 5000);
+            }
           });
           e.target.reset();
-          setErrorMessage(`Updated ${newName}`);
-          setTimeout(() => {
-            setErrorMessage(null);
-          }, 5000);
         }
         saveFlag = false;
       }
@@ -138,14 +148,21 @@ const App = () => {
         name: newName,
         number: newNumber,
       };
-      phonebookService
-        .updatePhoneBook(newPerson)
-        .then((res) => setPersons(persons.concat(res)));
-      e.target.reset();
-      setErrorMessage(`Added ${newName}`);
-      setTimeout(() => {
-        setErrorMessage(null);
-      }, 5000);
+      phonebookService.updatePhoneBook(newPerson).then((res) => {
+        if (res === undefined) {
+          setErrorMessage(`${newName} could not be added to PhoneBook`);
+          setTimeout(() => {
+            setErrorMessage(null);
+          }, 5000);
+        } else {
+          setPersons(persons.concat(res));
+          e.target.reset();
+          setErrorMessage(`Added ${newName}`);
+          setTimeout(() => {
+            setErrorMessage(null);
+          }, 5000);
+        }
+      });
     }
   };
 
@@ -170,7 +187,12 @@ const App = () => {
             setErrorMessage(null);
           }, 5000);
         } else {
-          console.log(`Error - Could not delete ${person.name} from database`);
+          setErrorMessage(
+            `Cound not delete ${person.name} as it has already been removed or the server is down`
+          );
+          setTimeout(() => {
+            setErrorMessage(null);
+          }, 5000);
         }
       });
     }
