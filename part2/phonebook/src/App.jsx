@@ -2,6 +2,13 @@ import { useEffect, useState } from "react";
 import phonebookService from "./services/phonebook";
 import "./App.css";
 
+const Notification = ({ message }) => {
+  if (message === null) {
+    return null;
+  }
+  return <div className="error">{message}</div>;
+};
+
 const DeletePerson = ({ person, handleDelete }) => {
   return (
     <button type="submit" onClick={() => handleDelete(person)}>
@@ -58,10 +65,10 @@ const PersonForm = ({ handleName, handleNumber, handleSubmit }) => {
   return (
     <form onSubmit={handleSubmit}>
       <div>
-        name: <input onChange={handleName} />
+        name: <input onChange={handleName} required/>
       </div>
       <div>
-        number: <input onChange={handleNumber} />
+        number: <input onChange={handleNumber} required/>
       </div>
       <div>
         <button type="submit">add</button>
@@ -76,6 +83,7 @@ const App = () => {
   const [newNumber, setNewNumber] = useState("");
   const [filterFlag, setFilterFlag] = useState(false);
   const [filterdPersons, setFilteredPersons] = useState([{}]);
+  const [errorMessage, setErrorMessage] = useState(null);
 
   useEffect(() => {
     phonebookService.getPhonebook().then((persons) => {
@@ -110,8 +118,12 @@ const App = () => {
             setFilteredPersons(
               filterdPersons.map((o) => (o.id !== person.id ? o : res))
             );
-          }); 
-          e.target.reset();         
+          });
+          e.target.reset();
+          setErrorMessage(`Updated ${newName}`);
+          setTimeout(() => {
+            setErrorMessage(null);
+          }, 5000);
         }
         saveFlag = false;
       }
@@ -130,6 +142,10 @@ const App = () => {
         .updatePhoneBook(newPerson)
         .then((res) => setPersons(persons.concat(res)));
       e.target.reset();
+      setErrorMessage(`Added ${newName}`);
+      setTimeout(() => {
+        setErrorMessage(null);
+      }, 5000);
     }
   };
 
@@ -149,6 +165,10 @@ const App = () => {
         if (status === 200) {
           setPersons(persons.filter((p) => p.id !== person.id));
           setFilteredPersons(filterdPersons.filter((p) => p.id !== person.id));
+          setErrorMessage(`Deleted ${person.name}`);
+          setTimeout(() => {
+            setErrorMessage(null);
+          }, 5000);
         } else {
           console.log(`Error - Could not delete ${person.name} from database`);
         }
@@ -159,6 +179,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={errorMessage} />
       <Filter handleFilter={handleFilter} />
       <h2>add a new</h2>
       <PersonForm
