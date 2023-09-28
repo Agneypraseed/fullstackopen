@@ -133,6 +133,7 @@ const App = () => {
       phonebookService.deletePerson(person.id).then((status) => {
         if (status === 200) {
           setPersons(persons.filter((p) => p.id !== person.id));
+          setFilteredPersons(filterdPersons.filter((p) => p.id !== person.id));
         } else {
           console.log(`Error - Could not delete ${person.name} from database`);
         }
