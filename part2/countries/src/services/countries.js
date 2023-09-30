@@ -12,15 +12,14 @@ const getAllCountries = () => {
 };
 
 const getCountryDetail = (name) => {
-    const url = `https://studies.cs.helsinki.fi/restcountries/api/name/${name}`
+  const url = `https://studies.cs.helsinki.fi/restcountries/api/name/${name}`;
 
-    const request = axios.get(url);
-    return request
+  const request = axios.get(url);
+  return request
     .then((response) => {
       if (response.status === 200 && response.data) return response.data;
     })
     .catch((err) => console.log("Error while fetching countries", err));
-
-}
+};
 
 export default { getAllCountries, getCountryDetail };

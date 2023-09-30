@@ -1,9 +1,9 @@
-input {  
-  outline: none; 
+input {
+  outline: none;
 }
 
 input:focus {
-  border: 3px solid blue;  
+  border: 3px solid blue;
 }
 
 .image-container img {
@@ -16,6 +16,6 @@ input:focus {
   align-items: center;
 }
 
-.filtered-contianer button{
+.filtered-contianer button {
   margin-left: 1rem;
 }
