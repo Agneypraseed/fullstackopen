@@ -1,6 +1,37 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 import countriesService from "./services/countries";
+import weatherService from "./services/weather";
+
+const WeatherDetails = ({ weather }) => {
+  return (
+    weather && (
+      <>
+        <p>temperature {(weather.main.temp - 273.15).toPrecision(2)} Celcius</p>
+        <img
+          src={`https://openweathermap.org/img/wn/${weather.weather[0].icon}@4x.png`}
+          alt="Weather Icon"
+        />
+        <p>wind {weather.wind.speed}</p>
+      </>
+    )
+  );
+};
+
+const Weather = ({ capital }) => {
+  const [weather, setWeather] = useState(null);
+
+  useEffect(() => {
+    weatherService.getWeather(capital).then((data) => setWeather(data));
+  }, []);
+
+  return (
+    <>
+      <h2>Weather in {capital}</h2>
+      <WeatherDetails weather={weather} />
+    </>
+  );
+};
 
 const Details = ({ details }) => {
   return (
@@ -23,6 +54,11 @@ const Details = ({ details }) => {
       <div className="image-container">
         <img src={details.flags.svg} alt={details.flags.alt} />
       </div>
+      <div>
+        {details.capital.map((capital) => (
+          <Weather key={capital} capital={capital} />
+        ))}
+      </div>
     </div>
   );
 };
@@ -30,10 +66,12 @@ const Details = ({ details }) => {
 const CountryDetails = ({ name }) => {
   const [details, setDetails] = useState([]);
 
-  countriesService
-    .getCountryDetail(name)
-    .then((details) => setDetails(details))
-    .catch((err) => console.log("Error fetching details", err));
+  useEffect(() => {
+    countriesService
+      .getCountryDetail(name)
+      .then((details) => setDetails(details))
+      .catch((err) => console.log("Error fetching details", err));
+  }, []);
 
   return details.length != 0 ? (
     <Details details={details} />
