@@ -42,22 +42,44 @@ const CountryDetails = ({ name }) => {
   );
 };
 
-const Country = ({ filteredCountries }) => {
-  const length = filteredCountries.length;
-
-  if (length === 1)
-    return <CountryDetails name={filteredCountries[0].name.common} />;
-  if (length > 10) return <p>Too many matches, specify another filter</p>;
-  if (length > 1 && length <= 10)
-    return filteredCountries.map((country) => (
-      <p key={country.name.common}>{country.name.common}</p>
-    ));
+const FilterdList = ({ filteredCountries, handleClick }) => {
+  return filteredCountries.map((country) => (
+    <div className="filtered-contianer" key={country.name.common}>
+      <p>{country.name.common}</p>
+      <button
+        type="submit"
+        onClick={(e) => {
+          e.preventDefault();
+          handleClick([country]);
+        }}
+      >
+        show
+      </button>
+    </div>
+  ));
 };
 
-const SearchCountry = ({ handleChange }) => {
+const Country = ({ filteredCountries, handleClick }) => {
+  const length = filteredCountries.length;
+
+  if (length === 1) {
+    return <CountryDetails name={filteredCountries[0].name.common} />;
+  }
+  if (length > 10) return <p>Too many matches, specify another filter</p>;
+  if (length > 1 && length <= 10) {
+    return (
+      <FilterdList
+        filteredCountries={filteredCountries}
+        handleClick={handleClick}
+      />
+    );
+  }
+};
+
+const SearchCountry = ({ handleChange, value }) => {
   return (
     <>
-      find countries <input onChange={handleChange} />
+      find countries <input value={value} onChange={handleChange} />
     </>
   );
 };
@@ -65,7 +87,7 @@ const SearchCountry = ({ handleChange }) => {
 function App() {
   const [allCountries, setAllCountries] = useState([]);
   const [filteredCountries, setFilteredCountries] = useState([]);
-  const [searchTerm, setSearchTerm] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     countriesService.getAllCountries().then((countries) => {
@@ -93,23 +115,32 @@ function App() {
   };
 
   const handleChange = (e) => {
-    const trimmedValue = e.target.value.toLowerCase().trim();
+    const trimmedValue = e.target.value.toLowerCase().trimStart();
+
     if (trimmedValue !== "") {
       setSearchTerm(trimmedValue);
       filterCountry(trimmedValue);
     } else {
       setFilteredCountries([]);
-      setSearchTerm(null);
+      setSearchTerm("");
     }
+  };
+
+  const handleClick = (country) => {
+    setSearchTerm(country[0].name.common);
+    setFilteredCountries(country);
   };
 
   return (
     <div>
-      <SearchCountry handleChange={handleChange} />
+      <SearchCountry value={searchTerm} handleChange={handleChange} />
       {allCountries.length != 0 ? (
         filteredCountries.length != 0 ? (
-          <Country filteredCountries={filteredCountries} />
-        ) : searchTerm != null ? (
+          <Country
+            filteredCountries={filteredCountries}
+            handleClick={handleClick}
+          />
+        ) : searchTerm != "" ? (
           <p>No matches found</p>
         ) : null
       ) : (

@@ -10,3 +10,12 @@ input:focus {
   max-width: 250px;
   max-height: 250px;
 }
+
+.filtered-contianer {
+  display: flex;
+  align-items: center;
+}
+
+.filtered-contianer button{
+  margin-left: 1rem;
+}
