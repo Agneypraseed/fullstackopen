@@ -42,14 +42,12 @@ const CountryDetails = ({ name }) => {
   );
 };
 
-const Country = ({ filteredCountries, allCountries }) => {
+const Country = ({ filteredCountries }) => {
   const length = filteredCountries.length;
 
-  if (length === 0 && allCountries.length !== 0) return <p>Not found</p>;
   if (length === 1)
     return <CountryDetails name={filteredCountries[0].name.common} />;
-  if (length > 10)
-    return <p>Too many matches, specify another filter</p>;
+  if (length > 10) return <p>Too many matches, specify another filter</p>;
   if (length > 1 && length <= 10)
     return filteredCountries.map((country) => (
       <p key={country.name.common}>{country.name.common}</p>
@@ -67,6 +65,7 @@ const SearchCountry = ({ handleChange }) => {
 function App() {
   const [allCountries, setAllCountries] = useState([]);
   const [filteredCountries, setFilteredCountries] = useState([]);
+  const [searchTerm, setSearchTerm] = useState(null);
 
   useEffect(() => {
     countriesService.getAllCountries().then((countries) => {
@@ -78,29 +77,41 @@ function App() {
 
   const filterCountry = (value) => {
     if (allCountries.length != 0) {
-      setFilteredCountries(
-        allCountries.filter((c) => {
-          return c.name.common.toLowerCase().includes(value);
-        })
+      let matchingCountries = allCountries.filter((c) =>
+        c.name.common.toLowerCase().includes(value)
       );
+
+      let exactMatch = matchingCountries.filter(
+        (c) => c.name.common.toLowerCase() === value.toLowerCase()
+      );
+      if (exactMatch.length != 0) {
+        setFilteredCountries(exactMatch);
+      } else {
+        setFilteredCountries(matchingCountries);
+      }
     }
   };
 
   const handleChange = (e) => {
     const trimmedValue = e.target.value.toLowerCase().trim();
-    if (trimmedValue !== "") filterCountry(trimmedValue);
+    if (trimmedValue !== "") {
+      setSearchTerm(trimmedValue);
+      filterCountry(trimmedValue);
+    } else {
+      setFilteredCountries([]);
+      setSearchTerm(null);
+    }
   };
 
   return (
     <div>
       <SearchCountry handleChange={handleChange} />
       {allCountries.length != 0 ? (
-        filteredCountries.length != 0 && (
-          <Country
-            filteredCountries={filteredCountries}
-            allCountries={allCountries}
-          />
-        )
+        filteredCountries.length != 0 ? (
+          <Country filteredCountries={filteredCountries} />
+        ) : searchTerm != null ? (
+          <p>No matches found</p>
+        ) : null
       ) : (
         <p>Please wait while data of all countries is loaded from server</p>
       )}
